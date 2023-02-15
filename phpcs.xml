@@ -45,4 +45,15 @@
       </property>
     </properties>
   </rule>
+
+  <rule ref="WordPress.WP.I18n">
+    <properties>
+      <!--
+      Verify that the text_domain is set to the desired text-domain.
+      Multiple valid text domains can be provided as a comma-delimited list.
+       -->
+      <property name="text_domain" type="array" value="wp-theme-migrator" />
+    </properties>
+  </rule>
+
 </ruleset>
