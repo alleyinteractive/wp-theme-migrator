@@ -1,7 +1,7 @@
 {
     "name": "alleyinteractive/wp-theme-migrator",
     "description": "A WordPress plugin to migrate to a new theme incrementally.",
-    "type": "library",
+    "type": "wordpress-plugin",
     "keywords": [
         "alleyinteractive",
         "wp-theme-migrator"
