@@ -1,7 +1,7 @@
 <?php
-namespace Create_PHP_Package\Tests\Feature;
+namespace WP_Theme_Migrator\Tests\Feature;
 
-use Create_PHP_Package\Tests\Test_Case;
+use WP_Theme_Migrator\Tests\Test_Case;
 
 /**
  * Visit {@see https://mantle.alley.co/testing/test-framework.html} to learn more.

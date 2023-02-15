@@ -1,5 +1,5 @@
 <?php
-namespace Create_PHP_Package\Tests\Unit;
+namespace WP_Theme_Migrator\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 

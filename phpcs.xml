@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="create-php-package" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/squizlabs/PHP_CodeSniffer/master/phpcs.xsd">
-  <description>PHP_CodeSniffer standard for create-php-package.</description>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="WP Theme Migrator" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/squizlabs/PHP_CodeSniffer/master/phpcs.xsd">
+  <description>PHP_CodeSniffer standard for WP Theme Migrator.</description>
 
   <!-- Include Alley Rules -->
   <rule ref="Alley-Interactive" />
@@ -22,6 +22,9 @@
   <!-- Check up to 20 files simultaneously. -->
   <arg name="parallel" value="20" />
 
+  <!-- Check for cross-version support for PHP 8.0 and higher. -->
+  <config name="testVersion" value="8.0-"/>
+
   <!-- Set severity to 1 to see everything that isn't effectively turned off. -->
   <arg name="severity" value="1" />
 
@@ -31,14 +34,14 @@
   <exclude-pattern>vendor/</exclude-pattern>
 
   <!-- The version set here matches the minimum version tested in buddy.yml. -->
-  <config name="minimum_supported_wp_version" value="5.9" />
+  <config name="minimum_supported_wp_version" value="6.1" />
 
   <!-- Define the prefixes that can be used by the plugin -->
   <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
     <properties>
       <property name="prefixes" type="array">
-        <element value="vendor_name" />
-        <element value="Create_PHP_Package" />
+        <element value="alleyinteractive" />
+        <element value="WP_Theme_Migrator" />
       </property>
     </properties>
   </rule>

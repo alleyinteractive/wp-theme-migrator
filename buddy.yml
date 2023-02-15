@@ -3,48 +3,48 @@
   ref_name: "refs/pull/*"
   ref_type: "WILDCARD"
   priority: "NORMAL"
-  target_site_url: "https://github.com/alleyinteractive/create-php-package"
+  target_site_url: "https://github.com/alleyinteractive/wp-theme-migrator"
   fetch_all_refs: true
   fail_on_prepare_env_warning: true
   trigger_condition: "ALWAYS"
   actions:
     - action: "Gitignored files check"
       type: "BUILD"
-      working_directory: "/buddy/create-php-package"
+      working_directory: "/buddy/wp-theme-migrator"
       docker_image_name: "alleyops/ci-resources"
       docker_image_tag: "8.0-fpm-wp"
       execute_commands:
         - "if [[ ! -z $(git ls-files -i --exclude-standard) ]]; then exit 1; fi"
       volume_mappings:
-        - "/:/buddy/create-php-package"
+        - "/:/buddy/wp-theme-migrator"
       trigger_condition: "ALWAYS"
       shell: "BASH"
       run_next_parallel: true
     - action: "Check for git conflicts"
       type: "BUILD"
-      working_directory: "/buddy/create-php-package"
+      working_directory: "/buddy/wp-theme-migrator"
       docker_image_name: "alleyops/ci-resources"
       docker_image_tag: "8.0-fpm-wp"
       execute_commands:
         - "! git grep -E '<<<<<<< |>>>>>>> ' -- './*' ':(exclude)buddy.yml' ':(exclude).buddy/*'"
       volume_mappings:
-        - "/:/buddy/create-php-package"
+        - "/:/buddy/wp-theme-migrator"
       trigger_condition: "ALWAYS"
       shell: "BASH"
     - action: "Composer install"
       type: "BUILD"
-      working_directory: "/buddy/create-php-package"
+      working_directory: "/buddy/wp-theme-migrator"
       docker_image_name: "alleyops/ci-resources"
       docker_image_tag: "8.0-fpm-wp"
       execute_commands:
         - "composer install -q"
       volume_mappings:
-        - "/:/buddy/create-php-package"
+        - "/:/buddy/wp-theme-migrator"
       trigger_condition: "ALWAYS"
       shell: "BASH"
     - action: "phpunit"
       type: "BUILD"
-      working_directory: "/buddy/create-php-package"
+      working_directory: "/buddy/wp-theme-migrator"
       docker_image_name: "alleyops/ci-resources"
       docker_image_tag: "8.0-fpm-wp"
       execute_commands:
@@ -66,19 +66,19 @@
             host: "memcached"
             port: 11211
       volume_mappings:
-        - "/:/buddy/create-php-package"
+        - "/:/buddy/wp-theme-migrator"
       trigger_condition: "ALWAYS"
       shell: "BASH"
       run_next_parallel: true
     - action: "composer phpcs"
       type: "BUILD"
-      working_directory: "/buddy/create-php-package"
+      working_directory: "/buddy/wp-theme-migrator"
       docker_image_name: "alleyops/ci-resources"
       docker_image_tag: "8.0-fpm-wp"
       execute_commands:
         - "composer phpcs"
       volume_mappings:
-        - "/:/buddy/create-php-package"
+        - "/:/buddy/wp-theme-migrator"
       trigger_condition: "ALWAYS"
       shell: "BASH"
   variables:
