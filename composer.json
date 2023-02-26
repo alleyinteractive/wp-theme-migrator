@@ -34,10 +34,10 @@
     "extra": {
         "wordpress-autoloader": {
             "autoload": {
-                "WP_Theme_Migrator\\": "src"
+                "Alley\\WP\\Theme_Migrator\\": "src"
             },
             "autoload-dev": {
-                "WP_Theme_Migrator\\Tests\\": "tests"
+                "Alley\\WP\\Theme_Migrator\\Tests\\": "tests"
             }
         }
     },

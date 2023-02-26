@@ -1,5 +1,11 @@
 <?php
-namespace WP_Theme_Migrator\Tests;
+/**
+ * Abstract Test Case.
+ *
+ * @package wp_theme_migrator
+ */
+
+namespace Alley\WP\Theme_Migrator\Tests;
 
 use Mantle\Testkit\Test_Case as TestkitTest_Case;
 
