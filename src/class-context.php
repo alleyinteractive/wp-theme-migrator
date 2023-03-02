@@ -26,40 +26,92 @@ class Context {
 	public $to_theme;
 
 	/**
+	 * Nested array of callbacks to determine migratability during a request. If
+	 * any callback in the array returns true for the current request then the
+	 * request will be loaded with the new theme.
+	 *
+	 * @var array
+	 * [
+	 * 		[
+	 * 			callable $callback Name of callback.
+	 * 			array    $args Array of parameters to be passed to callback.
+	 * 		]
+	 * ]
+	 */
+	public $callbacks;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param string $from_theme Theme slug to migrate from.
-	 * @param string $to_theme Theme slug to migrate to.
+	 * @param $args Array of context args.
+	 *	[
+	 * 		string $from_theme Theme slug to migrate from.
+	 *		string $to_theme Theme slug to migrate to.
+	 *		array  $callbacks Nested array of callbacks and args.
+	 * 	]
 	 */
-	public function __construct( string $from_theme = '', string $to_theme = '' ) {
-		if ( ! $this->is_valid_context( $from_theme, $to_theme ) ) {
+	public function __construct( array $args = [] ) {
+		if ( ! $this->is_valid_context( $args ) ) {
 			// @todo Add link to README with info on setup.
-			add_action(
-				'admin_notices',
-				function() {
-					?>
-					<div class="notice notice-error">
-						<p><?php esc_html_e( 'WP Theme Migrator requires setup to work properly.', 'wp-theme-migrator' ); ?></p>
-					</div>
-					<?php
-				}
-			);
-
+			$this->notify( 'error', __( 'WP Theme Migrator requires setup to work properly.', 'wp-theme-migrator' ) );
 			return;
 		}
 
-		$this->from_theme = $from_theme;
-		$this->to_theme   = $to_theme;
+		$this->from_theme = $args['from_theme'] ?? '';
+		$this->to_theme   = $args['to_theme'] ?? '';
+		$this->callbacks  = $args['callbacks'] ?? [];
+
+		$this->notify( 'info', __( 'WP Theme Migrator is active. Requests may load with a different theme.', 'wp-theme-migrator' ) );
+	}
+
+	/**
+	 * Add an admin notice.
+	 *
+	 * @param string $type Notice type.
+	 * @param string $message Notice message.
+	 */
+	protected function notify( string $type, string $message ) {
+		add_action(
+			'admin_notices',
+			function() {
+				?>
+				<div class="<?php echo esc_attr( "notice notice-${type}" ); ?>">
+					<p><?php echo esc_html( $message ); ?></p>
+				</div>
+				<?php
+			}
+		);
 	}
 
 	/**
 	 * Check if context args are valid.
 	 *
-	 * @param string $from_theme Theme slug to migrate from.
-	 * @param string $to_theme Theme slug to migrate to.
+	 * See Constructor for $args properties.
+	 *
+	 * @param $args Array of context args.
 	 * @return bool Valid or not.
 	 */
-	protected function is_valid_context( string $from_theme = '', string $to_theme = '' ): bool {
-		return ! ( empty( $from_theme ) && empty( $to_theme ) );
+	protected function is_valid_context( array $args = [] ): bool {
+		if ( empty( $args['from_theme'] ) || empty( $args['to_theme'] ) ) {
+			return false;
+		}
+
+		if ( ! empty( $args['callbacks'] ) ) {
+			foreach ( $args['callbacks'] as $callback ) {
+				if ( empty( $callback['callback'] ) ) {
+					return false;
+				}
+
+				if ( ! is_callable( $callback['callback'] ) ) {
+					return false;
+				}
+
+				if ( ! empty( $callback['args'] ) && ! is_array( $callback['args'] ) ) {
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 }
