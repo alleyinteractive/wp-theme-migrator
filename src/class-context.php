@@ -26,17 +26,11 @@ class Context {
 	public $to_theme;
 
 	/**
-	 * Nested array of callbacks to determine migratability during a request. If
+	 * Array of callbacks to determine migratability during a request. If
 	 * any callback in the array returns true for the current request then the
 	 * request will be loaded with the new theme.
 	 *
-	 * @var array
-	 * [
-	 * 		[
-	 * 			callable $callback Name of callback.
-	 * 			array    $args Array of parameters to be passed to callback.
-	 * 		]
-	 * ]
+	 * @var callable[]
 	 */
 	public $callbacks;
 
@@ -45,15 +39,24 @@ class Context {
 	 *
 	 * @param $args Array of context args.
 	 *	[
-	 * 		string $from_theme Theme slug to migrate from.
-	 *		string $to_theme Theme slug to migrate to.
-	 *		array  $callbacks Nested array of callbacks and args.
+	 * 		string     $from_theme Theme slug to migrate from.
+	 *		string     $to_theme Theme slug to migrate to.
+	 *		callable[] $callbacks Array of callbacks.
 	 * 	]
 	 */
 	public function __construct( array $args = [] ) {
 		if ( ! $this->is_valid_context( $args ) ) {
 			// @todo Add link to README with info on setup.
-			$this->notify( 'error', __( 'WP Theme Migrator requires setup to work properly.', 'wp-theme-migrator' ) );
+			add_action(
+				'admin_notices',
+				function() {
+					?>
+					<div class="notice notice-error">
+						<p><?php esc_html_e( 'WP Theme Migrator requires setup to work properly.', 'wp-theme-migrator' ); ?></p>
+					</div>
+					<?php
+				}
+			);
 			return;
 		}
 
@@ -61,22 +64,12 @@ class Context {
 		$this->to_theme   = $args['to_theme'] ?? '';
 		$this->callbacks  = $args['callbacks'] ?? [];
 
-		$this->notify( 'info', __( 'WP Theme Migrator is active. Requests may load with a different theme.', 'wp-theme-migrator' ) );
-	}
-
-	/**
-	 * Add an admin notice.
-	 *
-	 * @param string $type Notice type.
-	 * @param string $message Notice message.
-	 */
-	protected function notify( string $type, string $message ) {
 		add_action(
 			'admin_notices',
 			function() {
 				?>
-				<div class="<?php echo esc_attr( "notice notice-${type}" ); ?>">
-					<p><?php echo esc_html( $message ); ?></p>
+				<div class="notice notice-info">
+					<p><?php esc_html_e( 'WP Theme Migrator is active. Requests may load with a different theme.', 'wp-theme-migrator' ); ?></p>
 				</div>
 				<?php
 			}
@@ -91,24 +84,14 @@ class Context {
 	 * @param $args Array of context args.
 	 * @return bool Valid or not.
 	 */
-	protected function is_valid_context( array $args = [] ): bool {
+	public function is_valid_context( array $args = [] ): bool {
 		if ( empty( $args['from_theme'] ) || empty( $args['to_theme'] ) ) {
 			return false;
 		}
 
-		if ( ! empty( $args['callbacks'] ) ) {
-			foreach ( $args['callbacks'] as $callback ) {
-				if ( empty( $callback['callback'] ) ) {
-					return false;
-				}
-
-				if ( ! is_callable( $callback['callback'] ) ) {
-					return false;
-				}
-
-				if ( ! empty( $callback['args'] ) && ! is_array( $callback['args'] ) ) {
-					return false;
-				}
+		foreach ( $args['callbacks'] as $callback ) {
+			if ( ! is_callable( $callback ) ) {
+				return false;
 			}
 		}
 

@@ -52,7 +52,6 @@ require_once __DIR__ . '/vendor/wordpress-autoload.php';
  * Instantiate the plugin.
  */
 function main() {
-	// $migrator = Migrator::instance();
 	$migrator = new Migrator();
 
 	/**
@@ -61,16 +60,6 @@ function main() {
 	 * @param Migrator $migrator Migrator.
 	 */
 	do_action( 'wp_theme_migrator_before_init', $migrator );
-
-	$migrator->set_context(
-		/**
-		 * Filters context values.
-		 *
-		 * @param array    $context Array of context values.
-		 * @param Migrator $migrator Migrator instance.
-Z		 */
-		apply_filters( 'wp_theme_migrator_context', [], $migrator )
-	);
 
 	$migrator->init();
 

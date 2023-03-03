@@ -77,14 +77,14 @@ class Controller {
 	/**
 	 * Sets up WP_Theme_Migrator_WP instance and parses the request.
 	 */
-	public function set_up_wp() {
+	protected function set_up_wp() {
 		$this->wp->main();
 	}
 
 	/**
 	 * Set migratability of the current request.
 	 */
-	public function set_migratability() {
+	protected function set_migratability() {
 		/**
 		 * Skip migration checks while doing cron.
 		 *
@@ -118,20 +118,40 @@ class Controller {
 	 * Switch to the new theme.
 	 */
 	public function switch_theme() {
-		$requirements = validate_theme_requirements( $this->context->to_theme );
-		if ( is_wp_error( $requirements ) ) {
-			wp_die( $requirements );
+		if ( ! $this->is_theme_valid( $this->context->to_theme ) ) {
+			return;
 		}
-
 		// @todo Add child theme support.
-
-		// @todo Check REST API support.
+		// @todo Add sidebar and menu support.
 
 		// Filtering the theme-related options early ensures the STYLESHEETPATH
 		// and TEMPLATEPATH constants are set.
 		add_filter( 'option_stylesheet', fn() => $this->context->to_theme, 5 );
 		add_filter( 'option_template', fn() => $this->context->to_theme, 5 );
-		add_filter( 'option_current_theme', fn() => wp_get_theme( $this->context->to_theme )?->get( 'Name' ) ?? '', 5 );
+		add_filter( 'default_option_current_theme', fn() => wp_get_theme( $this->context->to_theme )?->get( 'Name' ) ?? '' );
+		add_filter( 'option_current_theme', fn() => wp_get_theme( $this->context->to_theme )?->get( 'Name' ) ?? '' );
+	}
+
+	/**
+	 * Validate theme.
+	 *
+	 * @param string $theme Theme slug.
+	 * @return bool Whether theme is valid.
+	 */
+	protected function is_theme_valid( string $theme ): bool {
+		$requirements = validate_theme_requirements( $theme );
+		if ( is_wp_error( $requirements ) ) {
+			error_log(
+				sprintf(
+					// translators: %s - Error message.
+					esc_html__( 'WP Theme Migrator failed. Invalid theme. %s', 'wp-theme-migrator' ),
+					$requirements->get_error_message()
+				)
+			);
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -145,14 +165,10 @@ class Controller {
 		}
 
 		foreach ( $this->context->callbacks as $callback ) {
-			if ( empty( $callback['callback'] ) ) {
-				continue;
-			}
-
 			// Callbacks are passed the query vars for the current request as
-			// the first argument. Because we're mocking WP early, the query
-			// vars will only include vars added in plugins, not themes.
-			if ( true === call_user_func_array( $callback['callback'], array_merge( [ $this->wp->query_vars ], $callback['args'] ?? [] ) ) ) {
+			// Because we're mocking WP early, the query vars will only include
+			// vars added in plugins, not themes.
+			if ( true === call_user_func_array( $callback, [ $this->wp->query_vars ] ) ) {
 				return true;
 			}
 		}
