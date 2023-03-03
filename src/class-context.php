@@ -37,12 +37,12 @@ class Context {
 	/**
 	 * Constructor.
 	 *
-	 * @param $args Array of context args.
-	 *	[
-	 * 		string     $from_theme Theme slug to migrate from.
-	 *		string     $to_theme Theme slug to migrate to.
-	 *		callable[] $callbacks Array of callbacks.
-	 * 	]
+	 * @param array $args Array of context args.
+	 *  [
+	 *      string     $from_theme Theme slug to migrate from.
+	 *      string     $to_theme Theme slug to migrate to.
+	 *      callable[] $callbacks Array of callbacks.
+	 *  ].
 	 */
 	public function __construct( array $args = [] ) {
 		if ( ! $this->is_valid_context( $args ) ) {
@@ -81,7 +81,7 @@ class Context {
 	 *
 	 * See Constructor for $args properties.
 	 *
-	 * @param $args Array of context args.
+	 * @param array $args Array of context args.
 	 * @return bool Valid or not.
 	 */
 	public function is_valid_context( array $args = [] ): bool {

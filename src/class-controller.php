@@ -55,7 +55,7 @@ class Controller {
 		add_action( 'setup_theme', [ $this, 'run' ], 100 );
 
 		// Add query vars for post types to our WP.
-		add_action( 'registered_post_type', [ $this, 'add_post_type_query_vars' ], 10, 2);
+		add_action( 'registered_post_type', [ $this, 'add_post_type_query_vars' ], 10, 2 );
 
 		// @todo Add query vars for taxonomies.
 	}
@@ -141,7 +141,7 @@ class Controller {
 	protected function is_theme_valid( string $theme ): bool {
 		$requirements = validate_theme_requirements( $theme );
 		if ( is_wp_error( $requirements ) ) {
-			error_log(
+			error_log( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				sprintf(
 					// translators: %s - Error message.
 					esc_html__( 'WP Theme Migrator failed. Invalid theme. %s', 'wp-theme-migrator' ),
@@ -181,7 +181,7 @@ class Controller {
 	 */
 	protected function stop_migrator() {
 		remove_action( 'setup_theme', [ $this, 'init' ], 100 );
-		remove_action( 'registered_post_type', [ $this, 'add_post_type_query_vars' ], 10, 2);
+		remove_action( 'registered_post_type', [ $this, 'add_post_type_query_vars' ], 10, 2 );
 	}
 
 	/**
@@ -189,7 +189,7 @@ class Controller {
 	 *
 	 * @see WP_Post_Type::add_rewrite_rules()
 	 *
-	 * @param string       $post_type Post type.
+	 * @param string        $post_type Post type.
 	 * @param \WP_Post_Type $post_type_object Arguments used to register the post type.
 	 */
 	public function add_post_type_query_vars( $post_type, $post_type_object ) {

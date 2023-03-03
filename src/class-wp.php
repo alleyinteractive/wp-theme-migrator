@@ -22,7 +22,7 @@ class WP extends \WP {
 		$parsed = $this->parse_request( $query_args );
 
 		if ( false === $parsed ) {
-			error_log(
+			error_log( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				esc_html__( 'WP Theme Migrator failed. Unable to parse request.', 'wp-theme-migrator' )
 			);
 		}
