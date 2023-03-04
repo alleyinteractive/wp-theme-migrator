@@ -31,10 +31,14 @@
         "sort-packages": true
     },
     "autoload": {
-        "Alley\\WP\\Theme_Migrator\\": "src"
+        "psr-4": {
+            "Alley\\WP\\Theme_Migrator\\": "src"
+        }
     },
     "autoload-dev": {
-        "Alley\\WP\\Theme_Migrator\\Tests\\": "tests"
+        "psr-4": {
+            "Alley\\WP\\Theme_Migrator\\Tests\\": "tests"
+        }
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
