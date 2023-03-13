@@ -21,11 +21,11 @@ class Test_Theme_Helpers extends Test_Case {
 	 */
 	public function data_is_valid_theme(): array {
 		return [
-			'valid classic theme' => [
+			'valid classic theme'    => [
 				'classic-theme',
 				true,
 			],
-			'missing theme' => [
+			'missing theme'          => [
 				'missing-theme',
 				false,
 			],
@@ -33,7 +33,7 @@ class Test_Theme_Helpers extends Test_Case {
 				'php-incompatible-theme',
 				false,
 			],
-			'WP-incompatible theme' => [
+			'WP-incompatible theme'  => [
 				'wp-incompatible-theme',
 				false,
 			],
@@ -48,11 +48,11 @@ class Test_Theme_Helpers extends Test_Case {
 	 * @param string $original Slug of theme to test.
 	 * @param bool   $expected The expected result.
 	 *
-	 * @throws ReflectionException
+	 * @throws ReflectionException Thrown if the class to reflect does not exist.
 	 */
 	public function test_is_valid_theme( string $original, bool $expected ) {
 		// Instantiate anonymous class to test trait.
-		$object = new class {
+		$object = new class() {
 			use Theme_Helpers;
 		};
 

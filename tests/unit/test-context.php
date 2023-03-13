@@ -21,20 +21,20 @@ class Test_Context extends Test_Case {
 	 */
 	public function data_is_valid_context(): array {
 		return [
-			'valid theme and empty callbacks' => [
+			'valid theme and empty callbacks'      => [
 				[
 					'theme'     => 'classic-theme',
 					'callbacks' => [],
 				],
 				true,
 			],
-			'valid theme and missing callbacks' => [
+			'valid theme and missing callbacks'    => [
 				[
 					'theme' => 'classic-theme',
 				],
 				true,
 			],
-			'valid theme and one valid callback' => [
+			'valid theme and one valid callback'   => [
 				[
 					'theme'     => 'classic-theme',
 					'callbacks' => [
@@ -43,7 +43,7 @@ class Test_Context extends Test_Case {
 				],
 				true,
 			],
-			'valid theme and two valid callbacks' => [
+			'valid theme and two valid callbacks'  => [
 				[
 					'theme'     => 'classic-theme',
 					'callbacks' => [
@@ -62,7 +62,7 @@ class Test_Context extends Test_Case {
 				],
 				false,
 			],
-			'valid theme and mixed callbacks' => [
+			'valid theme and mixed callbacks'      => [
 				[
 					'theme'     => 'classic-theme',
 					'callbacks' => [
@@ -72,7 +72,7 @@ class Test_Context extends Test_Case {
 				],
 				false,
 			],
-			'invalid theme and missing callbacks' => [
+			'invalid theme and missing callbacks'  => [
 				[
 					'theme' => 'not-a-theme',
 				],

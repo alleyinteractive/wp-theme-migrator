@@ -5,7 +5,6 @@
  * @package wp_theme_migrator
  */
 
-//  Mantle\Testing\install();
 \Mantle\Testing\manager()
 	->loaded(
 		function() {

@@ -15,6 +15,9 @@ use ReflectionClass;
  * Visit {@see https://phpunit.de/documentation.html} to learn more.
  */
 class Test_Controller extends Test_Case {
+	/**
+	 * Set up.
+	 */
 	public function setup(): void {
 		$this->valid_context = new Context(
 			[
@@ -28,7 +31,7 @@ class Test_Controller extends Test_Case {
 	/**
 	 * Tests the functionality of the set_up_wp method.
 	 *
-	 * @throws ReflectionException
+	 * @throws ReflectionException Thrown if the class to reflect does not exist.
 	 */
 	public function test_set_up_wp() {
 		$controller = new Controller( $this->valid_context );
@@ -40,7 +43,7 @@ class Test_Controller extends Test_Case {
 		$property = $class->getProperty( 'wp' );
 		$property->setAccessible( true );
 
-		$this->go_to( home_url( '/asdf/' ));
+		$this->go_to( home_url( '/asdf/' ) );
 		$method->invoke( $controller );
 
 		$this->assertNotEmpty( $property->getValue( $controller )->query_vars );
@@ -53,7 +56,7 @@ class Test_Controller extends Test_Case {
 	 */
 	public function data_set_migratability_during_cron(): array {
 		return [
-			'skip during cron' => [
+			'skip during cron'        => [
 				'__return_true',
 				false,
 			],
@@ -72,11 +75,11 @@ class Test_Controller extends Test_Case {
 	 * @param callable $original The filter callback to test.
 	 * @param bool     $expected The expected result.
 	 *
-	 * @throws ReflectionException
+	 * @throws ReflectionException Thrown if the class to reflect does not exist.
 	 */
 	public function test_set_migratability_during_cron( callable $original, bool $expected ) {
 		if ( ! defined( 'DOING_CRON' ) ) {
-			define( 'DOING_CRON', true );
+			define( 'DOING_CRON', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound
 		}
 
 		$controller = new Controller( $this->valid_context );
@@ -102,7 +105,7 @@ class Test_Controller extends Test_Case {
 	 */
 	public function data_check_migratability(): array {
 		return [
-			'a migrateable callback' => [
+			'a migrateable callback'    => [
 				[
 					'__return_true',
 				],
@@ -121,7 +124,7 @@ class Test_Controller extends Test_Case {
 				],
 				true,
 			],
-			'no callbacks' => [
+			'no callbacks'              => [
 				[],
 				false,
 			],
@@ -136,7 +139,7 @@ class Test_Controller extends Test_Case {
 	 * @param callable[] $original The array of callback to test.
 	 * @param bool       $expected The expected result.
 	 *
-	 * @throws ReflectionException
+	 * @throws ReflectionException Thrown if the class to reflect does not exist.
 	 */
 	public function test_check_migratability( array $original, bool $expected ) {
 		$controller = new Controller(
@@ -167,7 +170,7 @@ class Test_Controller extends Test_Case {
 					'theme'     => 'classic-theme',
 					'callbacks' => [ '__return_true' ],
 				],
-				true
+				true,
 			],
 		];
 	}
@@ -180,7 +183,7 @@ class Test_Controller extends Test_Case {
 	 * @param array $original The context to test.
 	 * @param bool  $expected The expected result.
 	 *
-	 * @throws ReflectionException
+	 * @throws ReflectionException Thrown if the class to reflect does not exist.
 	 */
 	public function test_switch_theme( array $original, bool $expected ) {
 		$controller = new Controller( new Context( $original ) );

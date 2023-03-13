@@ -36,14 +36,19 @@ trait Theme_Helpers {
 		return true;
 	}
 
+	/**
+	 * Get theme data. Returns WP_Theme object if $prop is omitted.
+	 *
+	 * @param string $theme Slug of theme to get.
+	 * @param string $prop  Name of property to get.
+	 * @return string|WP_Theme Value.
+	 */
 	protected function get_theme( string $theme, string $prop = '' ) {
 		if ( empty( $theme ) ) {
 			return '';
 		}
 
 		switch ( $prop ) {
-			case 'slug':
-				return $theme;
 			case 'name':
 				return wp_get_theme( $theme )?->get( 'Name' ) ?? '';
 			default:
