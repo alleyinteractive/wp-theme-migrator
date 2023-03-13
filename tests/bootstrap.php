@@ -5,8 +5,19 @@
  * @package wp_theme_migrator
  */
 
+//  Mantle\Testing\install();
 \Mantle\Testing\manager()
-	->maybe_rsync_plugin()
-	// Load the main file of the plugin.
-	->loaded( fn () => require_once __DIR__ . '/../wp-theme-migrator.php' )
+	->loaded(
+		function() {
+			if ( ! defined( 'ABSPATH' ) ) {
+				return;
+			}
+
+			// Load test themes.
+			$file_system = new Symfony\Component\Filesystem\Filesystem();
+			$file_system->mirror( __DIR__ . '/themes', get_theme_root() );
+
+			switch_theme( 'original' );
+		}
+	)
 	->install();

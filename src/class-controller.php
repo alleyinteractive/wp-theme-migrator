@@ -14,6 +14,8 @@ use Alley\WP\Theme_Migrator\WP as WP_Theme_Migrator_WP;
  * Controller class.
  */
 class Controller {
+	use \Alley\WP\Theme_Migrator\Theme_Helpers;
+
 	/**
 	 * Context instance.
 	 *
@@ -39,8 +41,19 @@ class Controller {
 	 * Constructor.
 	 *
 	 * @param Context $context Context object.
+	 *
+	 * @throws Exception Thrown if context is not valid.
 	 */
 	public function __construct( Context $context ) {
+		if ( ! $context->is_valid_context() ) {
+			throw new Exception(
+				// @todo Add more robust error messaging.
+				sprintf(
+					__( 'WP Theme Migrator failed. Context is not valid.', 'wp-theme-migrator' ),
+				)
+			);
+		}
+
 		$this->context = $context;
 		$this->wp      = new WP_Theme_Migrator_WP();
 		$this->init();
@@ -117,41 +130,42 @@ class Controller {
 	/**
 	 * Switch to the new theme.
 	 */
-	public function switch_theme() {
-		if ( ! $this->is_theme_valid( $this->context->to_theme ) ) {
-			return;
-		}
+	protected function switch_theme() {
 		// @todo Add child theme support.
 		// @todo Add sidebar and menu support.
 
 		// Filtering the theme-related options early ensures the STYLESHEETPATH
 		// and TEMPLATEPATH constants are set.
-		add_filter( 'option_stylesheet', fn() => $this->context->to_theme, 5 );
-		add_filter( 'option_template', fn() => $this->context->to_theme, 5 );
-		add_filter( 'default_option_current_theme', fn() => wp_get_theme( $this->context->to_theme )?->get( 'Name' ) ?? '' );
-		add_filter( 'option_current_theme', fn() => wp_get_theme( $this->context->to_theme )?->get( 'Name' ) ?? '' );
+		add_filter( 'option_stylesheet', [ $this, 'get_theme_stylesheet' ] );
+		add_filter( 'option_template', [ $this, 'get_theme_template' ] );
+		add_filter( 'option_current_theme', [ $this, 'get_theme_name' ] );
 	}
 
 	/**
-	 * Validate theme.
+	 * Get the theme stylesheet.
 	 *
-	 * @param string $theme Theme slug.
-	 * @return bool Whether theme is valid.
+	 * @return string Theme slug.
 	 */
-	protected function is_theme_valid( string $theme ): bool {
-		$requirements = validate_theme_requirements( $theme );
-		if ( is_wp_error( $requirements ) ) {
-			error_log( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-				sprintf(
-					// translators: %s - Error message.
-					esc_html__( 'WP Theme Migrator failed. Invalid theme. %s', 'wp-theme-migrator' ),
-					$requirements->get_error_message()
-				)
-			);
-			return false;
-		}
+	public function get_theme_stylesheet(): string {
+		return $this->context->get_theme_slug();
+	}
 
-		return true;
+	/**
+	 * Get the theme template.
+	 *
+	 * @return string Theme slug.
+	 */
+	public function get_theme_template(): string {
+		return $this->context->get_theme_slug();
+	}
+
+	/**
+	 * Get the name of the theme.
+	 *
+	 * @return string Theme name.
+	 */
+	public function get_theme_name(): string {
+		return $this->context->get_theme_name();
 	}
 
 	/**
@@ -160,14 +174,14 @@ class Controller {
 	 * @return bool Whether the request is migratable.
 	 */
 	protected function check_migratability(): bool {
-		if ( empty( $this->context->callbacks ) ) {
+		if ( empty( $this->context->get_callbacks() ) ) {
 			return false;
 		}
 
-		foreach ( $this->context->callbacks as $callback ) {
+		foreach ( $this->context->get_callbacks() as $callback ) {
 			// Callbacks are passed the query vars for the current request as
-			// Because we're mocking WP early, the query vars will only include
-			// vars added in plugins, not themes.
+			// Because we're parsing the request early, the query vars will only
+			// include vars added in plugins, not themes.
 			if ( true === call_user_func_array( $callback, [ $this->wp->query_vars ] ) ) {
 				return true;
 			}
