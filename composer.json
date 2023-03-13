@@ -15,7 +15,7 @@
     },
     {
       "name": "Contributors",
-      "homepage": "https://github.com/alleyinteractive/wp-theme-migrator/CONTRIBUTORS.md"
+      "homepage": "https://github.com/alleyinteractive/wp-theme-migrator/graphs/contributors"
     }
   ],
   "require": {
