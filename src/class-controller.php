@@ -180,7 +180,7 @@ class Controller {
 		}
 
 		foreach ( $this->context->get_callbacks() as $callback ) {
-			// Callbacks are passed the query vars for the current request as
+			// Callbacks are passed the query vars for the current request.
 			// Because we're parsing the request early, the query vars will only
 			// include vars added in plugins, not themes.
 			if ( true === call_user_func_array( $callback, [ $this->wp->query_vars ] ) ) {
