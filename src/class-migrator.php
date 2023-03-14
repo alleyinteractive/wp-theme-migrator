@@ -26,7 +26,7 @@ class Migrator {
 	 *
 	 * @var Controller
 	 */
-	protected $controller;
+	public $controller;
 
 	/**
 	 * Initializes Migrator.

@@ -51,6 +51,7 @@
       "phpcbf": "phpcbf .",
       "phpcs": "phpcs .",
       "phpunit": "WP_CORE_DIR=/tmp/wordpress phpunit",
+      "phpunit:multisite": "WP_CORE_DIR=/tmp/wordpress WP_MULTISITE=1 phpunit",
       "test": [
         "@phpcs",
         "@phpunit"

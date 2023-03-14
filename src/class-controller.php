@@ -9,6 +9,7 @@ namespace Alley\WP\Theme_Migrator;
 
 use Alley\WP\Theme_Migrator\Context;
 use Alley\WP\Theme_Migrator\WP as WP_Theme_Migrator_WP;
+use Exception;
 
 /**
  * Controller class.

@@ -5,15 +5,15 @@
  * @package wp_theme_migrator
  */
 
-\Mantle\Testing\manager()
+use Symfony\Component\Filesystem\Filesystem;
+use function Mantle\Testing\manager;
+
+// Run unit tests.
+manager()
 	->loaded(
 		function() {
-			if ( ! defined( 'ABSPATH' ) ) {
-				return;
-			}
-
 			// Load test themes.
-			$file_system = new Symfony\Component\Filesystem\Filesystem();
+			$file_system = new Filesystem();
 			$file_system->mirror( __DIR__ . '/themes', get_theme_root() );
 
 			switch_theme( 'original' );

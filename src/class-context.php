@@ -75,7 +75,7 @@ class Context {
 	 * @return string Theme slug.
 	 */
 	public function get_theme_slug() {
-		return $this->get_theme( $this->theme ?? '', 'slug' );
+		return $this->theme ?? '';
 	}
 
 	/**
