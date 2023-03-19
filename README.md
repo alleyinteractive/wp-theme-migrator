@@ -3,21 +3,31 @@
 [![Coding Standards](https://github.com/alleyinteractive/wp-theme-migrator/actions/workflows/coding-standards.yml/badge.svg)](https://github.com/alleyinteractive/wp-theme-migrator/actions/workflows/coding-standards.yml)
 [![Testing Suite](https://github.com/alleyinteractive/wp-theme-migrator/actions/workflows/unit-test.yml/badge.svg)](https://github.com/alleyinteractive/wp-theme-migrator/actions/workflows/unit-test.yml)
 
-A library to support incremental theme migrations in WordPress.
+A library to support agile, incremental theme migrations in WordPress.
 
 ## Background
 
-This package provides a library that facilitates an agile, incremental approach to migrating a WordPress site to a new theme.
+This package provides a library that facilitates a stepwise approach to migrating a WordPress site to a new theme.
 
-The conventional strategy for re-theming a site is to build an entire theme then activate the new theme on the production environment when it's complete. With WP Theme Migrator, you can leverage [a Strangler Fig pattern](https://martinfowler.com/bliki/StranglerFigApplication.html) to move gradually from an old theme to a new theme with both themes installed on the production environment.
+The conventional strategy for re-theming a site is to build an entire theme, then activate the new theme on the production environment when it's complete. This library enables you to use [a Strangler Fig pattern](https://martinfowler.com/bliki/StranglerFigApplication.html) to move gradually from an old theme to a new theme with both themes installed on the production environment.
 
-The logic of the migration strategy is determined by passing one or more callbacks to the Migrator during initialization. The Migrator parses the current query and passes it to each callback so you can base the migration strategy on post type, taxonomy, publish date, language, post meta or any public query var that is added before the Migrator is run.
+The parameters of the migration strategy are passed via callbacks to the Migrator during initialization. The Migrator parses the current request early and passes the query vars to each callback so you can base the migration strategy on post type, taxonomy, publish date, language, post meta or any public query var that is added before the Migrator is run.
 
-However, you're not limited to using query vars to define your migration strategy. The Migrator is agnostic – it only needs to know whether the current request has been migrated to the new theme. So your strategy could draw on globals, constants, an API integration, or the day of the week to determine migratability. With thoughtfully structured callbacks, you could even A/B test redesigned pages during development.
+Furthermore, you can define your migration strategy on more than just what's available in the query. The Migrator is agnostic – it only needs to know whether the current request has been migrated to the new theme. So your strategy can draw on globals, constants, an API integration, the day of the week – or any value that's available when the Migrator is run – to determine migratability.
+
+With thoughtfully structured callbacks, you can even A/B test redesigned pages during development. Individual content types can be built, tested, and released before the theme is complete, bringing a truly iterative cycle to your workflow.
 
 ## Releases
 
 This package is released via Packagist for installation via Composer. It follows semantic versioning conventions.
+
+## Roadmap
+
+This package is in a pre-release status. Milestones to be completed before the first release include:
+
+- Adding sidebar and menu support.
+- Adding theme mod support.
+- Adding feature testing.
 
 
 ### Install
@@ -96,6 +106,41 @@ function a_callback( $query_vars ): bool {
 
 Once you've migrated the entire site, activate your new theme, remove this package from your project, and uninstall your old theme.
 
+### From Source
+
+To work on this project locally, first add the repository to your project's
+`composer.json`:
+
+```json
+{
+	"repositories": [
+		{
+			"type": "path",
+			"url": "../path/to/wp-theme-migrator",
+			"options": {
+				"symlink": true
+			}
+		}
+	]
+}
+```
+
+Next, add the local development files to the `require` section of
+`composer.json`:
+
+```json
+{
+	"require": {
+		"alleyinteractive/wp-theme-migrator": "@dev"
+	}
+}
+```
+
+Finally, update composer to use the local copy of the package:
+
+```sh
+composer update alleyinteractive/wp-theme-migrator --prefer-source
+```
 
 ### Changelog
 
@@ -114,12 +159,7 @@ See [our contributor guidelines](CONTRIBUTING.md) for instructions on how to con
 
 ## Project Structure
 
-This is a Composer package that is published to
-[Packagist](https://packagist.org/).
-
-Classes must be autoloadable using
-`alleyinteractive/composer-wordpress-autoloader` and live in the `src`
-directory, following standard WordPress naming conventions for classes.
+This is a Composer package that is published to [Packagist](https://packagist.org/). Classes are autoloadable using `alleyinteractive/composer-wordpress-autoloader`. They live in the `src` directory and follow standard WordPress naming conventions for classes.
 
 
 ## Third-Party Dependencies
