@@ -3,38 +3,147 @@
 [![Coding Standards](https://github.com/alleyinteractive/wp-theme-migrator/actions/workflows/coding-standards.yml/badge.svg)](https://github.com/alleyinteractive/wp-theme-migrator/actions/workflows/coding-standards.yml)
 [![Testing Suite](https://github.com/alleyinteractive/wp-theme-migrator/actions/workflows/unit-test.yml/badge.svg)](https://github.com/alleyinteractive/wp-theme-migrator/actions/workflows/unit-test.yml)
 
-A WordPress plugin to migrate to a new theme incrementally.
+A library to support incremental theme migrations in WordPress.
 
-## Installation
+## Background
 
-You can install the package via composer:
+This package provides a library that facilitates an agile, incremental approach to migrating a WordPress site to a new theme.
 
-```bash
+The conventional strategy for re-theming a site is to build an entire theme then activate the new theme on the production environment when it's complete. With WP Theme Migrator, you can leverage [a Strangler Fig pattern](https://martinfowler.com/bliki/StranglerFigApplication.html) to move gradually from an old theme to a new theme with both themes installed on the production environment.
+
+The logic of the migration strategy is determined by passing one or more callbacks to the Migrator during initialization. The Migrator parses the current query and passes it to each callback so you can base the migration strategy on post type, taxonomy, publish date, language, post meta or any public query var that is added before the Migrator is run.
+
+However, you're not limited to using query vars to define your migration strategy. The Migrator is agnostic – it only needs to know whether the current request has been migrated to the new theme. So your strategy could draw on globals, constants, an API integration, or the day of the week to determine migratability. With thoughtfully structured callbacks, you could even A/B test redesigned pages during development.
+
+## Releases
+
+This package is released via Packagist for installation via Composer. It follows semantic versioning conventions.
+
+
+### Install
+
+Requires Composer and PHP >= 8.0.
+
+
+### Use
+
+Install a new valid theme. To be valid, it must exist in the `/wp-content/themes/` directory, be compatible with the local WordPress and PHP versions, and include at least a `style.css` file. Do not activate the new theme.
+
+Install this package via Composer.
+
+```sh
 composer require alleyinteractive/wp-theme-migrator
 ```
 
-## Usage
-
-Use this package like so:
+Ensure that the Composer autoloader is loaded into your project.
 
 ```php
-$package = WP_Theme_Migrator\WP_Theme_Migrator\WP_Theme_Migrator();
-$package->perform_magic();
+require_once __DIR__ . '/vendor/autoload.php';
 ```
 
-## Changelog
+Initialize the Migrator in your project. The Migrator performs its magic on the `setup_theme` hook so it must be initialized before that. Here, the Migrator object is created on the `plugins_loaded` hook:
 
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+```php
+/**
+* Initialize WP Theme Migrator early.
+*/
+function init_migrator() {
+	try {
+		$migrator = new \Alley\WP\Theme_Migrator\Migrator();
+		$migrator->init();
+	} catch( Exception  $e ) {
+		// Do something. The Migrator will throw an Exception when it's
+		// initialized with an invalid theme or callback. Be sure to catch
+		// the Exception to avoid a fatal error.
+	}
+}
+add_action( 'plugins_loaded', 'init_migrator' );
+```
 
-## Credits
+Pass the name of the new theme and a list of one or more callbacks to the Migrator. A callback must return `true` if a given request should be handled with the new theme. If more than one callback is provided, the Migrator will call each one once until one returns `true`. Then, the Migrator will load the new theme and no more callbacks will be called on that request. If none of the provided callbacks return `true`, the old theme will be loaded.
 
-This project is actively maintained by [Alley
-Interactive](https://github.com/alleyinteractive). Like what you see? [Come work
-with us](https://alley.co/careers/).
+```php
+/**
+* Add context for WP Theme Migrator.
+*
+* @param array    $context  Array of context values.
+* @param Migrator $migrator Migrator instance.
+*/
+function filter_wp_theme_migrator_context( $context, $migrator) {
+	return [
+		'theme' => 'new-theme-slug',
+		'callbacks' => [
+			'a_callback', // This can be any callable.
+			'another_callback',
+		],
+	];
+}
+add_filter( 'wp_theme_migrator_context', 'filter_wp_theme_migrator_context', 10, 2 );
+```
 
-- [Alley](https://github.com/Alley)
-- [All Contributors](../../contributors)
+Define your migration strategy through your callbacks.
+```php
+/**
+* Callback to manage theme migration.
+*
+* @param array $query_vars Array of query vars for the current request.
+* @return bool Whether to load the new theme.
+*/
+function a_callback( $query_vars ): bool {
+	// Do something to decide if the current request is migratable.
+}
+```
+
+Once you've migrated the entire site, activate your new theme, remove this package from your project, and uninstall your old theme.
+
+
+### Changelog
+
+This project keeps a [changelog](CHANGELOG.md).
+
+
+## Development Process
+
+See instructions above on installing from source. Pull requests are welcome from the community and will be considered for inclusion. Releases follow semantic versioning and are shipped on an as-needed basis.
+
+
+### Contributing
+
+See [our contributor guidelines](CONTRIBUTING.md) for instructions on how to contribute to this open source project.
+
+
+## Project Structure
+
+This is a Composer package that is published to
+[Packagist](https://packagist.org/).
+
+Classes must be autoloadable using
+`alleyinteractive/composer-wordpress-autoloader` and live in the `src`
+directory, following standard WordPress naming conventions for classes.
+
+
+## Third-Party Dependencies
+
+Dependencies are managed by Composer, and include:
+
+- `alleyinteractive/composer-wordpress-autoloader`: Used for autoloading classes that follow the standard WordPress conventions for filenames.
+- `alleyinteractive/alley-coding-standards`: Used for running phpcs linting.
+- `mantle-framework/testkit`: Used for running unit tests.
+- `symfony/filesystem`: Used for copying files into the WordPress test installation for testing.
+
+
+## Maintainers
+
+- [Alley](https://github.com/alleyinteractive)
+
+![Alley logo](https://avatars.githubusercontent.com/u/1733454?s=200&v=4)
+
+### Contributors
+
+Thanks to all of the [contributors](../../contributors) to this project.
+
 
 ## License
 
-The GNU General Public License (GPL) license. Please see [License File](LICENSE) for more information.
+This project is licensed under the
+[GNU Public License (GPL) version 2](LICENSE) or later.
