@@ -5,6 +5,8 @@
  * @package wp_theme_migrator
  */
 
+declare(strict_types = 1);
+
 use Symfony\Component\Filesystem\Filesystem;
 use function Mantle\Testing\manager;
 

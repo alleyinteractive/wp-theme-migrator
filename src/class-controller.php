@@ -5,6 +5,8 @@
  * @package wp_theme_migrator
  */
 
+declare(strict_types = 1);
+
 namespace Alley\WP\Theme_Migrator;
 
 use Alley\WP\Theme_Migrator\Context;
@@ -18,13 +20,6 @@ class Controller {
 	use \Alley\WP\Theme_Migrator\Theme_Helpers;
 
 	/**
-	 * Context instance.
-	 *
-	 * @var Context
-	 */
-	protected $context;
-
-	/**
 	 * WP_Theme_Migrator_WP instance.
 	 *
 	 * @var WP_Theme_Migrator_WP
@@ -32,7 +27,7 @@ class Controller {
 	protected $wp;
 
 	/**
-	 * Whether to handle the current request with the theme we're migrating to.
+	 * Whether to switch to the new theme for the current request.
 	 *
 	 * @var bool
 	 */
@@ -45,7 +40,9 @@ class Controller {
 	 *
 	 * @throws Exception Thrown if context is not valid.
 	 */
-	public function __construct( Context $context ) {
+	public function __construct(
+		protected Context $context,
+	) {
 		if ( ! $context->is_valid_context() ) {
 			throw new Exception(
 				// @todo Add more robust error messaging.
@@ -55,8 +52,7 @@ class Controller {
 			);
 		}
 
-		$this->context = $context;
-		$this->wp      = new WP_Theme_Migrator_WP();
+		$this->wp = new WP_Theme_Migrator_WP();
 		$this->init();
 	}
 
@@ -99,16 +95,16 @@ class Controller {
 	 * Set migratability of the current request.
 	 */
 	protected function set_migratability() {
-		/**
-		 * Skip migration checks while doing cron.
-		 *
-		 * @param bool              $skip_during_cron Whether to skip.
-		 * @param WP_Theme_Migrator $this This WP_Theme_Migrator instance.
-		 */
-		$skip_during_cron = apply_filters( 'wp_theme_migrator_skip_during_cron', true, $this );
-
-		if ( $skip_during_cron && defined( 'DOING_CRON' ) && DOING_CRON ) {
-			return;
+		if ( defined( 'DOING_CRON' ) && DOING_CRON ) {
+			/**
+			 * Skip migration checks while doing cron.
+			 *
+			 * @param bool              $skip_during_cron Whether to skip.
+			 * @param WP_Theme_Migrator $this This WP_Theme_Migrator instance.
+			 */
+			if ( apply_filters( 'wp_theme_migrator_skip_during_cron', true, $this ) ) {
+				return;
+			}
 		}
 
 		$this->should_migrate = $this->check_migratability();
@@ -175,10 +171,6 @@ class Controller {
 	 * @return bool Whether the request is migratable.
 	 */
 	protected function check_migratability(): bool {
-		if ( empty( $this->context->get_callbacks() ) ) {
-			return false;
-		}
-
 		foreach ( $this->context->get_callbacks() as $callback ) {
 			// Callbacks are passed the query vars for the current request.
 			// Because we're parsing the request early, the query vars will only

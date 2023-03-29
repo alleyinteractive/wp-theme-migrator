@@ -5,6 +5,8 @@
  * @package wp_theme_migrator
  */
 
+declare(strict_types = 1);
+
 namespace Alley\WP\Theme_Migrator;
 
 /**
@@ -14,34 +16,17 @@ class Context {
 	use \Alley\WP\Theme_Migrator\Theme_Helpers;
 
 	/**
-	 * Theme slug to migrate to.
-	 *
-	 * @var string
-	 */
-	protected $theme;
-
-	/**
-	 * Array of callbacks to determine migratability during a request. If
-	 * any callback in the array returns true for the current request then the
-	 * request will be loaded with the new theme.
-	 *
-	 * @var callable[]
-	 */
-	protected $callbacks = [];
-
-	/**
 	 * Constructor.
 	 *
-	 * @param array $args Array of context args.
-	 *  [
-	 *      string     $theme Theme slug to migrate to.
-	 *      callable[] $callbacks Array of callbacks.
-	 *  ].
+	 * @param string     $theme     Slug of theme to migrate to.
+	 * @param callable[] $callbacks Array of callbacks to determine
+	 * migratability during a request. If any callback in the array returns true
+	 * for the current request then the request will be loaded with the new theme.
 	 */
-	public function __construct( array $args = [] ) {
-		$this->theme     = $args['theme'] ?? '';
-		$this->callbacks = $args['callbacks'] ?? [];
-	}
+	public function __construct(
+		protected string $theme = '',
+		protected array $callbacks = [],
+	) {}
 
 	/**
 	 * Check if context args are valid.
@@ -52,11 +37,6 @@ class Context {
 		// A valid context must have a valid theme.
 		if ( ! $this->is_valid_theme( $this->theme ) ) {
 			return false;
-		}
-
-		// A valid context can lack callbacks.
-		if ( ! is_array( $this->callbacks ) ) {
-			return true;
 		}
 
 		// If callbacks exist, they must be valid callables.
@@ -74,8 +54,8 @@ class Context {
 	 *
 	 * @return string Theme slug.
 	 */
-	public function get_theme_slug() {
-		return $this->theme ?? '';
+	public function get_theme_slug(): string {
+		return $this->theme;
 	}
 
 	/**
@@ -83,8 +63,8 @@ class Context {
 	 *
 	 * @return string Theme name.
 	 */
-	public function get_theme_name() {
-		return $this->get_theme( $this->theme ?? '', 'name' );
+	public function get_theme_name(): string {
+		return $this->get_theme( $this->theme, 'name' );
 	}
 
 	/**
@@ -93,6 +73,6 @@ class Context {
 	 * @return callable[] Array of callbacks.
 	 */
 	public function get_callbacks(): array {
-		return $this->callbacks ?? [];
+		return $this->callbacks;
 	}
 }

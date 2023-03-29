@@ -81,7 +81,7 @@ Pass the name of the new theme and a list of one or more callbacks to the Migrat
 */
 function filter_wp_theme_migrator_context( $context, $migrator) {
 	return [
-		'theme' => 'new-theme-slug',
+		'theme'     => 'new-theme-slug',
 		'callbacks' => [
 			'a_callback', // This can be any callable.
 			'another_callback',

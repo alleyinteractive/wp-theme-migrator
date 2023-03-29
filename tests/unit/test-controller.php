@@ -5,6 +5,8 @@
  * @package wp_theme_migrator
  */
 
+declare(strict_types = 1);
+
 namespace Alley\WP\Theme_Migrator\Tests;
 
 use Alley\WP\Theme_Migrator\Context;
@@ -20,14 +22,13 @@ class Test_Controller extends Test_Case {
 	 */
 	public function setup(): void {
 		$this->valid_context = new Context(
-			[
-				'theme'     => 'classic-theme',
-				'callbacks' => [ '__return_true' ],
-			]
+			theme: 'classic-theme',
+			callbacks: [ '__return_true' ],
 		);
 
 		parent::setup();
 	}
+
 	/**
 	 * Tests the functionality of the set_up_wp method.
 	 *
@@ -124,6 +125,13 @@ class Test_Controller extends Test_Case {
 				],
 				true,
 			],
+			'an unmigrateable callback and a migrateable callback' => [
+				[
+					'__return_false',
+					'__return_true',
+				],
+				true,
+			],
 			'no callbacks'              => [
 				[],
 				false,
@@ -144,10 +152,8 @@ class Test_Controller extends Test_Case {
 	public function test_check_migratability( array $original, bool $expected ) {
 		$controller = new Controller(
 			new Context(
-				[
-					'theme'     => 'classic-theme',
-					'callbacks' => $original,
-				]
+				theme: 'classic-theme',
+				callbacks: $original,
 			)
 		);
 
@@ -186,7 +192,7 @@ class Test_Controller extends Test_Case {
 	 * @throws ReflectionException Thrown if the class to reflect does not exist.
 	 */
 	public function test_switch_theme( array $original, bool $expected ) {
-		$controller = new Controller( new Context( $original ) );
+		$controller = new Controller( new Context( $original['theme'] ?? '', $original['callbacks'] ?? [] ) );
 
 		$class  = new ReflectionClass( 'Alley\WP\Theme_Migrator\Controller' );
 		$method = $class->getMethod( 'switch_theme' );

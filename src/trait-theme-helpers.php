@@ -5,6 +5,8 @@
  * @package wp_theme_migrator
  */
 
+declare(strict_types = 1);
+
 namespace Alley\WP\Theme_Migrator;
 
 use WP_Theme;

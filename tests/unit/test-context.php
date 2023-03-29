@@ -5,6 +5,8 @@
  * @package wp_theme_migrator
  */
 
+declare(strict_types = 1);
+
 namespace Alley\WP\Theme_Migrator\Tests;
 
 use Alley\WP\Theme_Migrator\Context;
@@ -90,7 +92,24 @@ class Test_Context extends Test_Case {
 	 * @param bool  $expected The expected result.
 	 */
 	public function test_is_valid_context( array $original, bool $expected ) {
-		$context = new Context( $original );
+		switch ( true ) {
+			case array_key_exists( 'theme', $original ) && array_key_exists( 'callbacks', $original ):
+				$context = new Context( theme: $original['theme'], callbacks: $original['callbacks'] );
+				break;
+
+			case array_key_exists( 'theme', $original ) && ! array_key_exists( 'callbacks', $original ):
+				$context = new Context( theme: $original['theme'] );
+				break;
+
+			case ! array_key_exists( 'theme', $original ) && array_key_exists( 'callbacks', $original ):
+				$context = new Context( callbacks: $original['callbacks'] );
+				break;
+
+			case ! array_key_exists( 'theme', $original ) && ! array_key_exists( 'callbacks', $original ):
+				$context = new Context();
+				break;
+		}
+
 		$this->assertEquals( $expected, $context->is_valid_context() );
 	}
 }

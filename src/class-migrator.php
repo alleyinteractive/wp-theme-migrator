@@ -5,6 +5,8 @@
  * @package wp_theme_migrator
  */
 
+declare(strict_types = 1);
+
 namespace Alley\WP\Theme_Migrator;
 
 use Alley\WP\Theme_Migrator\Context;
@@ -19,14 +21,14 @@ class Migrator {
 	 *
 	 * @var Context
 	 */
-	protected $context;
+	protected Context $context;
 
 	/**
 	 * Controller instance.
 	 *
 	 * @var Controller
 	 */
-	protected $controller;
+	protected Controller $controller;
 
 	/**
 	 * Initializes Migrator.
@@ -34,12 +36,20 @@ class Migrator {
 	public function init() {
 		$this->context = new Context(
 			/**
-			 * Filters context values.
+			 * Filters context theme.
 			 *
-			 * @param array    $context Array of context values.
+			 * @param string   $theme Slug of theme to migrate to.
 			 * @param Migrator $migrator This Migrator instance.
 			 */
-			apply_filters( 'wp_theme_migrator_context', [], $this )
+			theme: apply_filters( 'wp_theme_migrator_theme', '', $this ),
+
+			/**
+			 * Filters context callbacks.
+			 *
+			 * @param callable[] $callbacks Array of callbacks to determine migratability.
+			 * @param Migrator   $migrator This Migrator instance.
+			 */
+			callbacks: apply_filters( 'wp_theme_migrator_callbacks', [], $this ),
 		);
 
 		$this->controller = new Controller( $this->context );
