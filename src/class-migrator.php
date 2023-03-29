@@ -42,7 +42,6 @@ class Migrator {
 			 * @param Migrator $migrator This Migrator instance.
 			 */
 			theme: apply_filters( 'wp_theme_migrator_theme', '', $this ),
-
 			/**
 			 * Filters context callbacks.
 			 *

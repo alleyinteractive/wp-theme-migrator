@@ -7,19 +7,19 @@ A library to support agile, incremental theme migrations in WordPress.
 
 ## Background
 
-This package provides a library that facilitates a stepwise approach to migrating a WordPress site to a new theme.
+This library facilitates an incremental approach to migrating a WordPress site to a new theme.
 
-The conventional strategy for re-theming a site is to build an entire theme, then activate the new theme on the production environment when it's complete. This library enables you to use [a Strangler Fig pattern](https://martinfowler.com/bliki/StranglerFigApplication.html) to move gradually from an old theme to a new theme with both themes installed on the production environment.
+The conventional strategy for re-theming a site is to build an entire theme, then activate the new theme on the production environment when it's complete. This library enables you to use [a Strangler Fig pattern](https://martinfowler.com/bliki/StranglerFigApplication.html) to move gradually from an old theme to a new theme, with both themes installed on the production environment.
 
 The parameters of the migration strategy are passed via callbacks to the Migrator during initialization. The Migrator parses the current request early and passes the query vars to each callback so you can base the migration strategy on post type, taxonomy, publish date, language, post meta or any public query var that is added before the Migrator is run.
 
-Furthermore, you can define your migration strategy on more than just what's available in the query. The Migrator is agnostic – it only needs to know whether the current request has been migrated to the new theme. So your strategy can draw on globals, constants, an API integration, the day of the week – or any value that's available when the Migrator is run – to determine migratability.
+Furthermore, you can define your migration strategy on more than just what's available in the query. The Migrator is agnostic – it only needs to know whether the current request should be migrated to the new theme. So your strategy can draw on globals, constants, an API integration, the day of the week – or any value that's available when the Migrator is run – to determine migratability.
 
 With thoughtfully structured callbacks, you can even A/B test redesigned pages during development. Individual content types can be built, tested, and released before the theme is complete, bringing a truly iterative cycle to your workflow.
 
 ## Releases
 
-This package is released via Packagist for installation via Composer. It follows semantic versioning conventions.
+This package follows semantic versioning conventions.
 
 ## Roadmap
 
@@ -64,31 +64,33 @@ function init_migrator() {
 	} catch( Exception  $e ) {
 		// Do something. The Migrator will throw an Exception when it's
 		// initialized with an invalid theme or callback. Be sure to catch
-		// the Exception to avoid a fatal error.
+		// the Exception to fatal errors.
 	}
 }
 add_action( 'plugins_loaded', 'init_migrator' );
 ```
 
-Pass the name of the new theme and a list of one or more callbacks to the Migrator. A callback must return `true` if a given request should be handled with the new theme. If more than one callback is provided, the Migrator will call each one once until one returns `true`. Then, the Migrator will load the new theme and no more callbacks will be called on that request. If none of the provided callbacks return `true`, the old theme will be loaded.
+Pass the name of the new theme and a list of one or more callbacks to the Migrator through filters. A callback must return `true` if a given request should be handled with the new theme. If more than one callback is provided, the Migrator will call each one once until one returns `true`. Then, the Migrator will load the new theme and no more callbacks will be called on that request. If none of the provided callbacks return `true`, the old theme will be loaded.
 
 ```php
 /**
-* Add context for WP Theme Migrator.
+ * Pass the new theme to WP Theme Migrator.
+ */
+add_filter( 'wp_theme_migrator_theme', fn() => 'new-theme-slug' );
+
+/**
+* Add callbacks for WP Theme Migrator to determine migratability.
 *
-* @param array    $context  Array of context values.
-* @param Migrator $migrator Migrator instance.
+* @param callable[] $callbacks Array of callbacks.
+* @param Migrator   $migrator Migrator instance.
 */
-function filter_wp_theme_migrator_context( $context, $migrator) {
+function filter_wp_theme_migrator_callbacks( $context, $migrator) {
 	return [
-		'theme'     => 'new-theme-slug',
-		'callbacks' => [
-			'a_callback', // This can be any callable.
-			'another_callback',
-		],
+		'a_callback', // This can be any callable.
+		'another_callback',
 	];
 }
-add_filter( 'wp_theme_migrator_context', 'filter_wp_theme_migrator_context', 10, 2 );
+add_filter( 'wp_theme_migrator_callbacks', 'filter_wp_theme_migrator_callbacks', 10, 2 );
 ```
 
 Define your migration strategy through your callbacks.
