@@ -1,11 +1,24 @@
 <?php
 /**
- * WP Theme Migrator Test Bootstrap
+ * Bootstrap.
+ *
+ * @package wp_theme_migrator
  */
 
-/**
- * Visit {@see https://mantle.alley.co/testing/test-framework.html} to learn more.
- */
-\Mantle\Testing\manager()
-	->maybe_rsync_plugin()
+declare(strict_types = 1);
+
+use Symfony\Component\Filesystem\Filesystem;
+use function Mantle\Testing\manager;
+
+// Run unit tests.
+manager()
+	->loaded(
+		function() {
+			// Load test themes.
+			$file_system = new Filesystem();
+			$file_system->mirror( __DIR__ . '/themes', get_theme_root() );
+
+			switch_theme( 'original' );
+		}
+	)
 	->install();
