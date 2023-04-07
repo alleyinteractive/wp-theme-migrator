@@ -10,7 +10,7 @@ declare(strict_types = 1);
 namespace Alley\WP\Theme_Migrator;
 
 use Alley\WP\Theme_Migrator\Context;
-use Alley\WP\Theme_Migrator\Contoller;
+use Alley\WP\Theme_Migrator\Controller;
 
 /**
  * Migrator class.
