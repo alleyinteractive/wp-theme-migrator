@@ -24,14 +24,14 @@ class Controller {
 	 *
 	 * @var WP_Theme_Migrator_WP
 	 */
-	protected $wp;
+	protected WP_Theme_Migrator_WP $wp;
 
 	/**
 	 * Whether to switch to the new theme for the current request.
 	 *
 	 * @var bool
 	 */
-	protected $should_migrate;
+	protected bool $should_migrate;
 
 	/**
 	 * Constructor.
@@ -203,5 +203,14 @@ class Controller {
 		if ( false !== $post_type_object->query_var && $this->wp && is_post_type_viewable( $post_type_object ) ) {
 			$this->wp->add_query_var( $post_type_object->query_var );
 		}
+	}
+
+	/**
+	 * Whether the current request is migratable.
+	 *
+	 * @return bool
+	 */
+	public function is_migratable(): bool {
+		return $this->should_migrate;
 	}
 }
