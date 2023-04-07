@@ -200,8 +200,15 @@ class Controller {
 	 * @param \WP_Post_Type $post_type_object Arguments used to register the post type.
 	 */
 	public function add_post_type_query_vars( $post_type, $post_type_object ) {
-		if ( false !== $post_type_object->query_var && $this->wp && is_post_type_viewable( $post_type_object ) ) {
-			$this->wp->add_query_var( $post_type_object->query_var );
+		$query_var = $post_type_object->query_var;
+
+		// Default to the post type slug, if not set.
+		if ( false === $query_var ) {
+			$query_var = $post_type_object->name ?? '';
+		}
+
+		if ( ! empty( $query_var ) && $this->wp && is_post_type_viewable( $post_type_object ) ) {
+			$this->wp->add_query_var( $query_var );
 		}
 	}
 }
