@@ -25,8 +25,6 @@ This package follows semantic versioning conventions.
 
 This package is in a pre-release status. Milestones to be completed before the first release include:
 
-- Adding sidebar and menu support.
-- Adding theme mod support.
 - Adding feature testing.
 
 

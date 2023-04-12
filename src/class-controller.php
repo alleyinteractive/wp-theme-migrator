@@ -24,24 +24,20 @@ class Controller {
 	 *
 	 * @var WP_Theme_Migrator_WP
 	 */
-	protected $wp;
-
-	/**
-	 * Whether to switch to the new theme for the current request.
-	 *
-	 * @var bool
-	 */
-	protected $should_migrate;
+	protected WP_Theme_Migrator_WP $wp;
 
 	/**
 	 * Constructor.
 	 *
 	 * @param Context $context Context object.
+	 * @param bool    $should_migrate Whether to switch to the new theme for the
+	 * current request.
 	 *
 	 * @throws Exception Thrown if context is not valid.
 	 */
 	public function __construct(
 		protected Context $context,
+		protected bool $should_migrate = false,
 	) {
 		if ( ! $context->is_valid_context() ) {
 			throw new Exception(
@@ -107,6 +103,18 @@ class Controller {
 			}
 		}
 
+		if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+			/**
+			 * Skip migration checks while doing Ajax.
+			 *
+			 * @param bool              $skip_during_ajax Whether to skip.
+			 * @param WP_Theme_Migrator $this This WP_Theme_Migrator instance.
+			 */
+			if ( apply_filters( 'wp_theme_migrator_skip_during_ajax', true, $this ) ) {
+				return;
+			}
+		}
+
 		$this->should_migrate = $this->check_migratability();
 	}
 
@@ -129,7 +137,6 @@ class Controller {
 	 */
 	protected function switch_theme() {
 		// @todo Add child theme support.
-		// @todo Add sidebar and menu support.
 
 		// Filtering the theme-related options early ensures the STYLESHEETPATH
 		// and TEMPLATEPATH constants are set.
@@ -176,9 +183,23 @@ class Controller {
 			// Because we're parsing the request early, the query vars will only
 			// include vars added in plugins, not themes.
 			if ( true === call_user_func_array( $callback, [ $this->wp->query_vars ] ) ) {
+
+				/**
+				 * Runs when a request is migratable.
+				 *
+				 * @param Controller $this Controller instance.
+				 */
+				do_action( 'wp_theme_migrator_migrating', $this );
 				return true;
 			}
 		}
+
+		/**
+		 * Runs when a request is not migratable.
+		 *
+		 * @param Controller $this Controller instance.
+		 */
+		do_action( 'wp_theme_migrator_not_migrating', $this );
 
 		return false;
 	}
@@ -187,7 +208,7 @@ class Controller {
 	 * Stop migrator.
 	 */
 	protected function stop_migrator() {
-		remove_action( 'setup_theme', [ $this, 'init' ], 100 );
+		remove_action( 'setup_theme', [ $this, 'run' ], 100 );
 		remove_action( 'registered_post_type', [ $this, 'add_post_type_query_vars' ], 10, 2 );
 	}
 
