@@ -56,9 +56,19 @@ class Controller {
 	 * Add hooks to kick off migrator and tie in useful query vars.
 	 */
 	protected function init() {
-		// Post types and taxonomies must be registered by this point to be used
-		// for determining migratability.
-		add_action( 'setup_theme', [ $this, 'run' ], 100 );
+		/**
+		 * The callback to wp_enable_block_templates() in core eventually sets
+		 * up a static variable that indicates whether the theme has a
+		 * theme.json. Our priority is set at 8 so we can determine which
+		 * theme we're using before that happens.
+		 *
+		 * @see https://github.com/WordPress/WordPress/blob/master/wp-includes/default-filters.php#L710
+		 *
+		 * Custom post types and taxonomies must be registered before the
+		 * `run()` callback is run to be available for determining
+		 * migratability.
+		 */
+		add_action( 'setup_theme', [ $this, 'run' ], 8 );
 
 		// Add query vars for post types to our WP.
 		add_action( 'registered_post_type', [ $this, 'add_post_type_query_vars' ], 10, 2 );
@@ -208,7 +218,7 @@ class Controller {
 	 * Stop migrator.
 	 */
 	protected function stop_migrator() {
-		remove_action( 'setup_theme', [ $this, 'run' ], 100 );
+		remove_action( 'setup_theme', [ $this, 'run' ], 8 );
 		remove_action( 'registered_post_type', [ $this, 'add_post_type_query_vars' ], 10, 2 );
 	}
 
