@@ -20,7 +20,7 @@
   "require-dev": {
     "alleyinteractive/alley-coding-standards": "^1.0",
     "mantle-framework/testkit": "^0.10.1 || ^0.12.0",
-    "nunomaduro/collision": "^5.0 || ^6.0",
+    "nunomaduro/collision": "^5.0 || ^6.0 || ^7.0",
     "symfony/filesystem": "^6.0"
   },
   "config": {
