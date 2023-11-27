@@ -162,7 +162,7 @@ class Controller {
 	 * This introduced a bug in which the theme path can not be reset if
 	 * `get_template_directory()` or `get_stylesheet_directory()` are called
 	 * before the theme has been fully initialized. This method resets the
-	 * the globals if they are present.
+	 * globals if they are present.
 	 *
 	 * @see https://github.com/WordPress/wordpress-develop/commit/b6bf3553d975da2e017a00443b7639aacf0a8586
 	 */
