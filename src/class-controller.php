@@ -136,6 +136,8 @@ class Controller {
 			return;
 		}
 
+		$this->maybe_reset_globals();
+
 		$this->switch_theme();
 
 		// Only migrate once in a request.
@@ -153,6 +155,37 @@ class Controller {
 		add_filter( 'option_stylesheet', [ $this, 'get_theme_stylesheet' ] );
 		add_filter( 'option_template', [ $this, 'get_theme_template' ] );
 		add_filter( 'option_current_theme', [ $this, 'get_theme_name' ] );
+	}
+
+	/**
+	 * In WP 6.4.1, the template and stylesheet paths were memoized in globals.
+	 * This introduced a bug in which the theme path can not be reset if
+	 * `get_template_directory()` or `get_stylesheet_directory()` are called
+	 * before the theme has been fully initialized. This method resets the
+	 * globals if they are present.
+	 *
+	 * @see https://github.com/WordPress/wordpress-develop/commit/b6bf3553d975da2e017a00443b7639aacf0a8586
+	 */
+	protected function maybe_reset_globals(): void {
+		if ( ! array_key_exists( 'wp_template_path', $GLOBALS ) && ! array_key_exists( 'wp_stylesheet_path', $GLOBALS ) ) {
+			return;
+		}
+
+		global $wp_template_path, $wp_stylesheet_path;
+
+		$stylesheet = $this->get_theme_stylesheet();
+		$theme_root = get_theme_root( $stylesheet );
+
+		if ( "$theme_root/$stylesheet" !== $wp_stylesheet_path ) {
+			$wp_stylesheet_path = null; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+		}
+
+		$template   = $this->get_theme_stylesheet();
+		$theme_root = get_theme_root( $template );
+
+		if ( "$theme_root/$template" !== $wp_template_path ) {
+			$wp_template_path = null; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+		}
 	}
 
 	/**
