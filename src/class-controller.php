@@ -105,10 +105,10 @@ class Controller {
 			/**
 			 * Skip migration checks while doing cron.
 			 *
-			 * @param bool              $skip_during_cron Whether to skip.
-			 * @param WP_Theme_Migrator $this This WP_Theme_Migrator instance.
+			 * @param bool                 $skip_during_cron Whether to skip.
+			 * @param WP_Theme_Migrator_WP $instance This WP_Theme_Migrator instance.
 			 */
-			if ( apply_filters( 'wp_theme_migrator_skip_during_cron', true, $this ) ) {
+			if ( apply_filters( 'wp_theme_migrator_skip_during_cron', true, $this->wp ) ) {
 				return;
 			}
 		}
@@ -117,10 +117,10 @@ class Controller {
 			/**
 			 * Skip migration checks while doing Ajax.
 			 *
-			 * @param bool              $skip_during_ajax Whether to skip.
-			 * @param WP_Theme_Migrator $this This WP_Theme_Migrator instance.
+			 * @param bool                 $skip_during_ajax Whether to skip.
+			 * @param WP_Theme_Migrator_WP $instance This WP_Theme_Migrator instance.
 			 */
-			if ( apply_filters( 'wp_theme_migrator_skip_during_ajax', true, $this ) ) {
+			if ( apply_filters( 'wp_theme_migrator_skip_during_ajax', true, $this->wp ) ) {
 				return;
 			}
 		}
@@ -230,7 +230,7 @@ class Controller {
 				/**
 				 * Runs when a request is migratable.
 				 *
-				 * @param Controller $this Controller instance.
+				 * @param Controller $instance Controller instance.
 				 */
 				do_action( 'wp_theme_migrator_migrating', $this );
 				return true;
@@ -240,7 +240,7 @@ class Controller {
 		/**
 		 * Runs when a request is not migratable.
 		 *
-		 * @param Controller $this Controller instance.
+		 * @param Controller $instance Controller instance.
 		 */
 		do_action( 'wp_theme_migrator_not_migrating', $this );
 
@@ -252,7 +252,7 @@ class Controller {
 	 */
 	protected function stop_migrator() {
 		remove_action( 'setup_theme', [ $this, 'run' ], 8 );
-		remove_action( 'registered_post_type', [ $this, 'add_post_type_query_vars' ], 10, 2 );
+		remove_action( 'registered_post_type', [ $this, 'add_post_type_query_vars' ], 10 );
 	}
 
 	/**
@@ -264,7 +264,7 @@ class Controller {
 	 * @param \WP_Post_Type $post_type_object Arguments used to register the post type.
 	 */
 	public function add_post_type_query_vars( $post_type, $post_type_object ) {
-		if ( false !== $post_type_object->query_var && $this->wp && is_post_type_viewable( $post_type_object ) ) {
+		if ( false !== $post_type_object->query_var && is_post_type_viewable( $post_type_object ) ) {
 			$this->wp->add_query_var( $post_type_object->query_var );
 		}
 	}

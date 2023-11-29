@@ -31,11 +31,7 @@ trait Theme_Helpers {
 		}
 
 		// Check that the theme exists.
-		if ( false === ( wp_get_theme( $theme )?->exists() ?? false ) ) {
-			return false;
-		}
-
-		return true;
+		return wp_get_theme( $theme )->exists();
 	}
 
 	/**
@@ -52,7 +48,7 @@ trait Theme_Helpers {
 
 		switch ( $prop ) {
 			case 'name':
-				return wp_get_theme( $theme )?->get( 'Name' ) ?? '';
+				return wp_get_theme( $theme )->get( 'Name' ) ?: '';
 			default:
 				return wp_get_theme( $theme );
 		}
