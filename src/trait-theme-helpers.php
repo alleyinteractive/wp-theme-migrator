@@ -57,5 +57,4 @@ trait Theme_Helpers {
 				return wp_get_theme( $theme );
 		}
 	}
-
 }

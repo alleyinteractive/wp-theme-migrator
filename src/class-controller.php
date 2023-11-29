@@ -43,7 +43,7 @@ class Controller {
 			throw new Exception(
 				// @todo Add more robust error messaging.
 				sprintf(
-					__( 'WP Theme Migrator failed. Context is not valid.', 'wp-theme-migrator' ),
+					esc_html__( 'WP Theme Migrator failed. Context is not valid.', 'wp-theme-migrator' ),
 				)
 			);
 		}
